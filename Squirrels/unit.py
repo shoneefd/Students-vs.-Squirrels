@@ -31,6 +31,7 @@ class Human(Unit):
 		return True
 
 	def act(self, campus):
+		self.attack(self.get_target()):
 
 	def get_target(self):
 		place = self.place
@@ -43,11 +44,6 @@ class Human(Unit):
 	def attack(self, target):
 		if target is not None:
 			target.get_hit(self.damage)
-
-class Undergraduate(Human):
-
-	def act(self, campus):
-		self.attack(self.get_target()):
 
 class GSI(Human):
 
@@ -70,7 +66,7 @@ class Junior(Human):
     damage = 3
     cost = 4
 
-class Sophomore(Undergraduate):
+class Sophomore(Human):
 
 	cost = 3
 	name = 'Sophomore'
@@ -102,6 +98,92 @@ class Senior(Sophomore):
 	cost = 6
 	real = True
 	damage = 2
+
+class CSProfessor(Human):
+
+	name = 'CS Professor'
+	cost = 6
+	damage = 0
+	prof_exists = False
+	line = 'I am a computer scientist!'
+
+	def __init__(self, health, place=None):
+		if not CSProfessor.prof_exists:
+			Unit.__init__(self, health, place)
+			CSProfessor.prof_exists = True
+		else:
+			return
+
+	def act(self, campus):
+		self.talk_shit()
+
+	def talk_shit(self):
+		# print(self.line)
+		self.get_hit(self.health)
+
+class Hilfinger(CSProfessor):
+
+	name = 'Hilfinger'
+	real = True
+	line = 'RTFM!'
+
+	def act(self, campus):
+		Senior.damage *= 2
+		Junior.damage *= 2
+		Sophomore.damage *= 2
+		Freshman.damage *= 2
+		place = self.place.entrance
+		while not isinstance(place, Tree):
+			if place.Human:
+				place.Human.damage *= 2
+			place = place.entrance
+		place = self.place.exit
+		while not isinstance(place, Nuts):
+			if place.Human:
+				place.Human.damage *= 2
+			place = place.exit
+		CSProfessor.act(self, campus)
+
+class DeNero(CSProfessor):
+
+	name = 'DeNero'
+	real = True
+	line = ' '
+
+	def act(self, campus):
+		place = self.place.exit
+		while not isinstance(place, Nuts):
+			place = place.exit
+		while not isinstance(place, Tree):
+			place.Squirrels = []
+			place = place.entrance
+		CSProfessor.act(self, campus)
+
+class Hug(CSProfessor):
+
+	name = 'Hug'
+	real = True
+	line = ' '
+	hugs = 0
+	
+	def __init__(self, health, place=None):
+		if not CSProfessor.prof_exists or Hug.hugs < 3:
+			Unit.__init__(self, health, place)
+			CSProfessor.prof_exists = True
+			Hug.hugs +=1
+		else:
+			return
+
+	def act(self, campus):
+		place = self.place.exit
+		length = 5
+		while not isinstance(place, Nuts):
+			place = place.exit
+		while not isinstance(place, Tree) and length > 0:
+			place.Squirrels = []
+			place = place.entrance
+			length -= 1
+		CSProfessor.act(self, campus)
 	
 
 class Squirrel(Unit):
