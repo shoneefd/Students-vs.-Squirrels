@@ -253,10 +253,10 @@ class Freshman(ThrowerAnt): #freshman
     food_cost = 2
     implemented = True   # Change to True to view in the GUI
 
-class Sophmore(ThrowerAnt): #sophmore
+class Sophomore(ThrowerAnt): #sophmore
     """A ThrowerAnt that only throws leaves at Bees at least 5 places away."""
     year = 2
-    name = 'Sophmore'
+    name = 'Sophomore'
     food_cost = 3
     implemented = True   # Change to True to view in the GUI
     def action(self, colony):
@@ -286,7 +286,25 @@ class Senior(ThrowerAnt): #Senior
 #     name = 'CS Professor'
 #     cost = 6
 #     damage = 0
+#     implemented = False
 #     prof_exists = false
+#     line = 'I am a computer scientist!'
+#
+#     def __init__(self, health, place=None):
+# 		if not CSProfessor.prof_exists:
+# 			Insect.__init__(self, health, place)
+# 			CSProfessor.prof_exists = True
+# 		else:
+# 			return
+#
+#     def action(self, colony):
+# 		self.talk_shit()
+#
+#     def talk_shit(self):
+# 		# print(self.line)
+# 		self.get_hit(self.health)
+
+
 
 class QueenAnt(Ant):  # You should change this line
     """The Queen of the colony.  The game is over if a bee enters her place."""

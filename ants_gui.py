@@ -29,12 +29,12 @@ import random
 
 STRATEGY_SECONDS = 3
 INSECT_FILES = {
-                'Freshman': 'img/Student Pixel.png',
-                'Sophmore': 'img/Sophmore Pixel.png',
-                'Junior': 'img/Junior Pixel.png',
-                'Senior': 'img/Senior Pixel.png',
-                'GSI': 'img/Student Pixel.png',
-                'Squirrel': 'img/Squirrel Pixel.png',
+                'Freshman': 'Student-Pixel.gif',
+                'Sophomore': 'Sophomore-Pixel.gif',
+                'Junior': 'Junior-Pixel.gif',
+                'Senior': 'Senior-Pixel.gif',
+                'GSI': 'Student-Pixel.gif',
+                'Squirrel': 'Squirrel-Pixel.gif',
 
                 'Worker': 'img/ant_harvester.gif',
                 'Thrower': 'img/ant_thrower.gif',
@@ -60,7 +60,7 @@ LEAF_START_OFFSET = (30, 30)
 LEAF_END_OFFSET = (50, 30)
 LEAF_COLORS = {'Thrower': 'ForestGreen',
                'Freshman': 'Green',
-               'Sophmore': 'LightBlue',
+               'Sophomore': 'LightBlue',
                'Junior': 'Purple',
                 'Senior': 'Red',
 
