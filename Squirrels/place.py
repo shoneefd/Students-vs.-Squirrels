@@ -83,7 +83,7 @@ class Campus(object):
     """
 
     def __init__(self, strategy, tree, unit_types, create_places, dimensions, nuts=2):
-        """Create an AntColony for simulating a game.
+        """Create a Campus for simulating a game.
 
         Arguments:
         strategy -- a function to deploy ants to places
@@ -111,7 +111,7 @@ class Campus(object):
                 self.squirrel_entrances.append(place)
         register_place(self.tree, False)
         create_places(base, register_place, self.dimensions[0], self.dimensions[1])
-        # create_places originally takes in self.queen for create places here. 
+        # create_places originally takes in self.queen for create places here.
 
     def simulate(self):
         """Simulate an attack on the campus (i.e., play the game)."""
@@ -145,13 +145,13 @@ class Campus(object):
         This method is called by the current strategy to deploy humans.
         """
         constructor = self.unit_types[human_type_name]
-        if self.nuts < constructor.nut_cost:
+        if self.nuts < constructor.cost:
             print('Not enough nut remains to place ' + human_type_name)
         else:
             human = constructor()
             self.places[place_name].add_unit(human)
-            self.nut -= constructor.nut_cost
-            return huma
+            self.nuts -= constructor.cost
+            return human
 
     def remove_human(self, place_name):
         """Remove a human from the Campus."""
@@ -165,7 +165,7 @@ class Campus(object):
 
     @property
     def squirrels(self):
-        return [s for p in self.places.values() for s in p.bees]
+        return [s for p in self.places.values() for s in p.squirrels]
 
     @property
     def units(self):
@@ -192,7 +192,6 @@ def plaza_layout(queen, register_place, tunnels=1, length=10, moat_frequency=3):
     #             exit = Place('tunnel_{0}_{1}'.format(tunnel, step), exit)
     #         register_place(exit, step == length - 1)
 
-    
 
 =======
 =======
