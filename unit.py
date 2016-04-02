@@ -24,12 +24,13 @@ class Unit:
 
 class Human(Unit):
 
-	damage = 0
+	cost = 0
+	real = False
 
 	def is_human(self):
 		return True
 
-	def act(self):
+	def act(self, campus):
 
 	def get_target(self):
 		place = self.place
@@ -44,9 +45,20 @@ class Human(Unit):
 
 class Undergraduate(Human):
 
-	def act(self):
+	def act(self, campus):
 		self.attack(self.get_target()):
-		
+
+class GSI(Human):
+
+	real = True
+	cost = 2
+	name = 'GSI'
+
+	def act(self, campus):
+		campus.nuts += 1
+
+class Freshman(Undergraduate):
+	
 
 class Squirrel(Unit):
 
