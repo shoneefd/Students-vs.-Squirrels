@@ -183,17 +183,18 @@ class GSI(Ant): #GSI
 
     """HarvesterAnt produces 1 additional food per turn for the colony."""
     name = 'GSI'
+    year = 5
     implemented = True
     food_cost = 2
 
     def action(self, colony):
         colony.food+=1
 
-class ThrowerAnt(Ant): #fourth year
+class ThrowerAnt(Ant):
     """ThrowerAnt throws a leaf each turn at the nearest Bee in its range."""
 
     name = 'Thrower'
-    implemented = True
+    implemented = False
     damage = 1
     food_cost = 4
     min_range = 0
@@ -247,14 +248,14 @@ def random_or_none(s):
 
 class Freshman(ThrowerAnt): #freshman
     """A ThrowerAnt that only throws leaves at Bees at most 3 places away."""
-
+    year = 1
     name = 'Freshman'
     food_cost = 2
     implemented = True   # Change to True to view in the GUI
 
 class Sophmore(ThrowerAnt): #sophmore
     """A ThrowerAnt that only throws leaves at Bees at least 5 places away."""
-
+    year = 2
     name = 'Sophmore'
     food_cost = 3
     implemented = True   # Change to True to view in the GUI
@@ -265,12 +266,14 @@ class Sophmore(ThrowerAnt): #sophmore
 
 class Junior(ThrowerAnt): #Junior
     name = 'Junior'
+    year = 3
     food_cost = 4
     damage = 3
     implemented = True
 
 class Senior(ThrowerAnt): #Senior
     name = 'Senior'
+    year = 4
     food_cost = 6
     damage = 2
     implemented = True
@@ -279,6 +282,11 @@ class Senior(ThrowerAnt): #Senior
         self.throw_at(self.nearest_bee(colony.hive))
         self.throw_at(self.nearest_bee(colony.hive))
 
+# class Professor(Ant):
+#     name = 'CS Professor'
+#     cost = 6
+#     damage = 0
+#     prof_exists = false
 
 class QueenAnt(Ant):  # You should change this line
     """The Queen of the colony.  The game is over if a bee enters her place."""
@@ -287,7 +295,7 @@ class QueenAnt(Ant):  # You should change this line
     # BEGIN Problem 9
     food_cost = 6
     placed = False
-    implemented = True   # Change to True to view in the GUI
+    implemented = False   # Change to True to view in the GUI
     # END Problem 9
 
     def __init__(self):
@@ -385,32 +393,7 @@ def apply_effect(effect, bee, duration):
     bee.action = new_bee_action
     # END Problem EC
 
-class SlowThrower(ThrowerAnt):
-    """ThrowerAnt that causes Slow on Bees."""
 
-    name = 'Slow'
-    # BEGIN Problem EC
-    food_cost = 4
-    implemented = False   # Change to True to view in the GUI
-    # END Problem EC
-
-    def throw_at(self, target):
-        if target:
-            apply_effect(make_slow, target, 3)
-
-
-class StunThrower(ThrowerAnt):
-    """ThrowerAnt that causes Stun on Bees."""
-
-    name = 'Stun'
-    # BEGIN Problem EC
-    food_cost = 6
-    implemented = False   # Change to True to view in the GUI
-    # END Problem EC
-
-    def throw_at(self, target):
-        if target:
-            apply_effect(make_stun, target, 1)
 
 
 ##################
@@ -578,6 +561,7 @@ def ant_types():
         new_types = [t for c in new_types for t in c.__subclasses__()]
         all_ant_types.extend(new_types)
     return [t for t in all_ant_types if t.implemented]
+
 
 class GameOverException(Exception):
     """Base game over Exception."""

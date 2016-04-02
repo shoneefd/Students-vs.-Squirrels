@@ -30,20 +30,17 @@ import random
 STRATEGY_SECONDS = 3
 INSECT_FILES = {
                 'Freshman': 'img/Student Pixel.png',
-                'Sophmore': 'img/Student Pixel.png',
-                'Junior': 'img/Student Pixel.png',
-                'Senior': 'img/Student Pixel.png',
+                'Sophmore': 'img/Sophmore Pixel.png',
+                'Junior': 'img/Junior Pixel.png',
+                'Senior': 'img/Senior Pixel.png',
                 'GSI': 'img/Student Pixel.png',
                 'Squirrel': 'img/Squirrel Pixel.png',
 
                 'Worker': 'img/ant_harvester.gif',
                 'Thrower': 'img/ant_thrower.gif',
-                'Slow': 'img/ant_freeze.gif',
-                'Stun': 'img/ant_stun.gif',
                 'Wall': 'img/ant_wall.gif',
                 'Queen': 'img/ant_queen.gif',
                 'Remover': 'img/remover.gif',
-
 
 }
 TUNNEL_FILE = 'img/tunnel.gif'
@@ -66,7 +63,6 @@ LEAF_COLORS = {'Thrower': 'ForestGreen',
                'Sophmore': 'LightBlue',
                'Junior': 'Purple',
                 'Senior': 'Red',
-               'Slow': 'LightBlue',
 
                'Queen': 'Purple',
                'Laser': 'Blue'}
