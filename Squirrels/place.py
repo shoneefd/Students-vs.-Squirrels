@@ -76,10 +76,10 @@ class Campus(object):
 
     Attributes:
     time -- elapsed time
-    food -- the colony's available food total
-    queen -- the place where the queen resides
-    places -- A list of all places in the colony (including a Hive)
-    bee_entrances -- A list of places that bees can enter
+    nut -- the campus's available nut total
+    base -- the base
+    places -- A list of all places in the  (including a Tree)
+    squirrel_entrances -- A list of places that bees can enter
     """
 
     def __init__(self, strategy, tree, unit_types, create_places, dimensions, nuts=2):
@@ -111,7 +111,6 @@ class Campus(object):
                 self.squirrel_entrances.append(place)
         register_place(self.tree, False)
         create_places(base, register_place, self.dimensions[0], self.dimensions[1])
-        # create_places originally takes in self.queen for create places here.
 
     def simulate(self):
         """Simulate an attack on the campus (i.e., play the game)."""
@@ -120,7 +119,7 @@ class Campus(object):
             while True:
                 self.tree.strategy(self)            # squirrels invade
                 self.strategy(self)                 # humans deploy
-                for human in self.humanss:               # humans take actions
+                for human in self.humans:               # humans take actions
                     if human.health > 0:
                         human.action(self)
                 for squirrel in self.active_squirrels[:]:     # squirrels take actions
@@ -140,17 +139,17 @@ class Campus(object):
             return False
 
     def deploy_human(self, place_name, human_type_name):
-        """Place an ant if enough food is available.
+        """Place an ant if enough nut is available.
 
         This method is called by the current strategy to deploy humans.
         """
         constructor = self.unit_types[human_type_name]
-        if self.nuts < constructor.cost:
+        if self.nuts < constructor.nut_cost:
             print('Not enough nut remains to place ' + human_type_name)
         else:
             human = constructor()
             self.places[place_name].add_unit(human)
-            self.nuts -= constructor.cost
+            self.nut -= constructor.nut_cost
             return human
 
     def remove_human(self, place_name):
@@ -165,7 +164,7 @@ class Campus(object):
 
     @property
     def squirrels(self):
-        return [s for p in self.places.values() for s in p.squirrels]
+        return [s for p in self.places.values() for s in p.bees]
 
     @property
     def units(self):
@@ -191,6 +190,10 @@ def plaza_layout(queen, register_place, tunnels=1, length=10, moat_frequency=3):
     #         else:
     #             exit = Place('tunnel_{0}_{1}'.format(tunnel, step), exit)
     #         register_place(exit, step == length - 1)
+    for stem in range(length):
+        exit = base
+        exit = Place('tunnel_{0}_{1}'.format(tunnel, step), exit)
+        register_place(exit, step == length - 1)
 
 
 =======
@@ -236,7 +239,7 @@ def start_with_strategy(args, strategy):
 
     tree = Tree(assault_plan)
     dimensions = (num_tunnels, tunnel_length)
-    return AntColony(strategy, tree, human_types(), layout, dimensions, cost).simulate()
+    return Antcampus(strategy, tree, human_types(), layout, dimensions, cost).simulate()
 
 from utils import *
 @main
