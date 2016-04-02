@@ -92,99 +92,117 @@ class Campus(object):
     bee_entrances -- A list of places that bees can enter
     """
 
-    def __init__(self, strategy, hive, ant_types, create_places, dimensions, food=2):
+    def __init__(self, strategy, tree, unit_types, create_places, dimensions, nuts=2):
         """Create an AntColony for simulating a game.
 
         Arguments:
         strategy -- a function to deploy ants to places
-        hive -- a Hive full of bees
-        ant_types -- a list of ant constructors
+        tree -- a Tree full of bees
+        unit_types -- a list of unit constructors
         create_places -- a function that creates the set of places
         dimensions -- a pair containing the dimensions of the game layout
         """
         self.time = 0
-        self.food = food
+        self.nuts = nuts
         self.strategy = strategy
-        self.hive = hive
-        self.ant_types = OrderedDict((a.name, a) for a in ant_types)
-        self.dimensions = dimensions
-        self.active_bees = []
-        self.configure(hive, create_places)
+        self.tree = tree
+        self.unit_types = OrderedDict((a.name, a) for a in unit_types)
+        self.active_squirrels = []
+        self.configure(tree, create_places)
 
-    def configure(self, hive, create_places):
-        """Configure the places in the colony."""
-        self.queen = QueenPlace('AntQueen')
+    def configure(self, tree, create_places):
+        """Configure the places in the campus."""
         self.places = OrderedDict()
-        self.bee_entrances = []
-        def register_place(place, is_bee_entrance):
+        self.squirrel_entrances = []
+        def register_place(place, is_squirrel_entrance):
             self.places[place.name] = place
-            if is_bee_entrance:
-                place.entrance = hive
-                self.bee_entrances.append(place)
-        register_place(self.hive, False)
-        create_places(self.queen, register_place, self.dimensions[0], self.dimensions[1])
+            if is_squirrel_entrance:
+                place.entrance = tree
+                self.squirrel_entrances.append(place)
+        register_place(self.tree, False)
+        create_places(base, register_place, self.dimensions[0], self.dimensions[1])
+        # create_places originally takes in self.queen for create places here. 
 
     def simulate(self):
-        """Simulate an attack on the ant colony (i.e., play the game)."""
-        num_bees = len(self.bees)
+        """Simulate an attack on the campus (i.e., play the game)."""
+        num_squirrels = len(self.squirrels)
         try:
             while True:
-                self.hive.strategy(self)            # Bees invade
-                self.strategy(self)                 # Ants deploy
-                for ant in self.ants:               # Ants take actions
-                    if ant.armor > 0:
-                        ant.action(self)
-                for bee in self.active_bees[:]:     # Bees take actions
-                    if bee.armor > 0:
-                        bee.action(self)
-                    if bee.armor <= 0:
-                        num_bees -= 1
-                        self.active_bees.remove(bee)
-                if num_bees == 0:
-                    raise AntsWinException()
+                self.tree.strategy(self)            # squirrels invade
+                self.strategy(self)                 # humans deploy
+                for human in self.humanss:               # humans take actions
+                    if human.health > 0:
+                        human.action(self)
+                for squirrel in self.active_squirrels[:]:     # squirrels take actions
+                    if squirrel.health > 0:
+                        squirrel.action(self)
+                    if squirrel.health <= 0:
+                        num_squirrels -= 1
+                        self.active_squirrels.remove(squirrel)
+                if num_squirrels == 0:
+                    raise HumansWinException()
                 self.time += 1
-        except AntsWinException:
-            print('All bees are vanquished. You win!')
+        except HumansWinException:
+            print('All squirrels are vanquished. You win!')
             return True
-        except BeesWinException:
-            print('The ant queen has perished. Please try again.')
+        except SquirrelsWinException:
+            print('Humans have perished. Please try again.')
             return False
 
-    def deploy_ant(self, place_name, ant_type_name):
+    def deploy_human(self, place_name, human_type_name):
         """Place an ant if enough food is available.
 
-        This method is called by the current strategy to deploy ants.
+        This method is called by the current strategy to deploy humans.
         """
-        constructor = self.ant_types[ant_type_name]
-        if self.food < constructor.food_cost:
-            print('Not enough food remains to place ' + ant_type_name)
+        constructor = self.unit_types[human_type_name]
+        if self.nuts < constructor.nut_cost:
+            print('Not enough nut remains to place ' + human_type_name)
         else:
-            ant = constructor()
-            self.places[place_name].add_insect(ant)
-            self.food -= constructor.food_cost
-            return ant
+            human = constructor()
+            self.places[place_name].add_unit(human)
+            self.nut -= constructor.nut_cost
+            return huma
 
-    def remove_ant(self, place_name):
-        """Remove an Ant from the Colony."""
+    def remove_human(self, place_name):
+        """Remove a human from the Campus."""
         place = self.places[place_name]
         if place.ant is not None:
-            place.remove_insect(place.ant)
+            place.remove_unit(place.human)
 
     @property
-    def ants(self):
-        return [p.ant for p in self.places.values() if p.ant is not None]
+    def humans(self):
+        return [p.human for p in self.places.values() if p.human is not None]
 
     @property
-    def bees(self):
-        return [b for p in self.places.values() for b in p.bees]
+    def squirrels(self):
+        return [s for p in self.places.values() for s in p.bees]
 
     @property
-    def insects(self):
-        return self.ants + self.bees
+    def units(self):
+        return self.humans + self.squirrels
 
     def __str__(self):
-        status = ' (Food: {0}, Time: {1})'.format(self.food, self.time)
-        return str([str(i) for i in self.ants + self.bees]) + status
+        status = ' (Nut: {0}, Time: {1})'.format(self.nut, self.time)
+        return str([str(i) for i in self.humans + self.squirrels]) + status
+
+
+# Weiwei's edit: add layouts
+###########
+# Layouts #
+###########
+
+def plaza_layout(queen, register_place, tunnels=1, length=10, moat_frequency=3):
+    """Register Sproul Plaza layout."""
+    # for tunnel in range(tunnels):
+    #     exit = queen
+    #     for step in range(length):
+    #         if moat_frequency != 0 and (step + 1) % moat_frequency == 0:
+    #             exit = Water('water_{0}_{1}'.format(tunnel, step), exit)
+    #         else:
+    #             exit = Place('tunnel_{0}_{1}'.format(tunnel, step), exit)
+    #         register_place(exit, step == length - 1)
+
+    
 
 =======
 class AssaultPlan(dict):
