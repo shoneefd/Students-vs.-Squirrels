@@ -56,6 +56,8 @@ class GSI(Human):
 
 	def act(self, campus):
 		campus.nuts += 1
+		
+		
 
 class Sophomore(Undergraduate):
 
@@ -87,6 +89,43 @@ class Senior(Sophomore):
 	cost = 6
 	real = True
 	damage = 2
+	
+class Freshman(Human):
+    name = 'Freshman'
+    real = True
+    damage = 1
+    cost = 2
+    min_range = 0
+    max_range = 10
+
+    def nearest_squirrel(self, Tree):
+        check_place = self.place
+        nearest_place = None
+        count = 0
+
+        while nearest_place is None and check_place.name != 'Tree' and count <= self.max_range:
+            if len(check_place.Squirrel) == 0 or count < self.min_range:
+                check_place = check_place.entrance
+                count += 1
+            else:
+                nearest_place = check_place
+        if nearest_place is None:
+            return None
+        else:
+            return random_or_none(nearest_place.Squirrel)
+
+    def fight(self, target):
+        if target is not None:
+            target.get_hit(self.damage)
+
+    def action(self, campus):
+        self.fight(self.nearest_squirrel(campus.Tree))
+
+class Junior(Freshman):
+    name = 'Junior'
+    real = True
+    damage = 3
+    cost = 4
 	
 
 class Squirrel(Unit):
