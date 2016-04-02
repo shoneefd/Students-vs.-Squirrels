@@ -24,11 +24,29 @@ class Unit:
 
 class Human(Unit):
 
-	def lose_health(self, hit=1):
-		self.health -= hit
-		if self.health <= 0:
-			self.remove_unit()
-	#def remove_unit(self)
+	damage = 0
+
+	def is_human(self):
+		return True
+
+	def act(self):
+
+	def get_target(self):
+		place = self.place
+		while not isinstance(place, Tree):
+			if len(place.squirrels) > 0:
+				return place.squirrels[0]
+			place = place.entrance
+		return None
+
+	def attack(self, target):
+		target.health -= self.damage
+
+class Undergraduate(Human):
+
+	def act(self):
+		self.attack(self.get_target()):
+		
 
 class Squirrel(Unit):
 
