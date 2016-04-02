@@ -57,7 +57,36 @@ class GSI(Human):
 	def act(self, campus):
 		campus.nuts += 1
 
-class Freshman(Undergraduate):
+class Sophomore(Undergraduate):
+
+	cost = 3
+	name = 'Sophomore'
+	real = True
+	damage = 1
+
+	def get_target(self):
+		place = self.place
+		targets = []
+		while not isinstance(place, Tree) and len(targets) < 2:
+			if len(place.squirrels) > 0:
+				targets += place.squirrels
+			place = place.entrance
+
+	def attack(self, target):
+		if len(target) <= 2:
+			for t in target:
+				Human.attack(self, t)
+		else:
+			target0 = target[0]
+			target1 = target[1]
+			Human.attack(self, target0)
+			Human.attack(self, target1)
+
+class Senior(Sophomore):
+	
+	cost = 6
+	real = True
+	damage = 2
 	
 
 class Squirrel(Unit):
