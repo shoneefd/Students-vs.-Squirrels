@@ -1,6 +1,7 @@
 #The Place class includes path and non-path places.#
 
 import random
+import unit.py
 
 class Place(object):
     """A Place holds squirrels/humans and has an exit leading to another Place."""
@@ -69,6 +70,15 @@ class Base(Place):
         assert not unit.is_human, 'Cannot add {0} to QueenPlace'
         raise SquirrelsWinException()
 
+# Weiwei's edit: added ants_win and bees_win
+def ants_win():
+    """Signal that Ants win."""
+    raise AntsWinException()
+
+def bees_win():
+    """Signal that Bees win."""
+    raise BeesWinException()
+
 class GameOverException(Exception):
     """Base game over Exception."""
     pass
@@ -80,3 +90,113 @@ class HumansWinException(GameOverException):
 class SquirrelsWinException(GameOverException):
     """Exception to signal that the bees win."""
     pass
+
+
+# Weiwei's edit: added the Game Setting: campus
+##################
+# Game Setting #
+##################
+class Campus(object):
+    """An ant collective that manages global game state and simulates time.
+
+    Attributes:
+    time -- elapsed time
+    food -- the colony's available food total
+    queen -- the place where the queen resides
+    places -- A list of all places in the colony (including a Hive)
+    bee_entrances -- A list of places that bees can enter
+    """
+
+    def __init__(self, strategy, hive, ant_types, create_places, dimensions, food=2):
+        """Create an AntColony for simulating a game.
+
+        Arguments:
+        strategy -- a function to deploy ants to places
+        hive -- a Hive full of bees
+        ant_types -- a list of ant constructors
+        create_places -- a function that creates the set of places
+        dimensions -- a pair containing the dimensions of the game layout
+        """
+        self.time = 0
+        self.food = food
+        self.strategy = strategy
+        self.hive = hive
+        self.ant_types = OrderedDict((a.name, a) for a in ant_types)
+        self.dimensions = dimensions
+        self.active_bees = []
+        self.configure(hive, create_places)
+
+    def configure(self, hive, create_places):
+        """Configure the places in the colony."""
+        self.queen = QueenPlace('AntQueen')
+        self.places = OrderedDict()
+        self.bee_entrances = []
+        def register_place(place, is_bee_entrance):
+            self.places[place.name] = place
+            if is_bee_entrance:
+                place.entrance = hive
+                self.bee_entrances.append(place)
+        register_place(self.hive, False)
+        create_places(self.queen, register_place, self.dimensions[0], self.dimensions[1])
+
+    def simulate(self):
+        """Simulate an attack on the ant colony (i.e., play the game)."""
+        num_bees = len(self.bees)
+        try:
+            while True:
+                self.hive.strategy(self)            # Bees invade
+                self.strategy(self)                 # Ants deploy
+                for ant in self.ants:               # Ants take actions
+                    if ant.armor > 0:
+                        ant.action(self)
+                for bee in self.active_bees[:]:     # Bees take actions
+                    if bee.armor > 0:
+                        bee.action(self)
+                    if bee.armor <= 0:
+                        num_bees -= 1
+                        self.active_bees.remove(bee)
+                if num_bees == 0:
+                    raise AntsWinException()
+                self.time += 1
+        except AntsWinException:
+            print('All bees are vanquished. You win!')
+            return True
+        except BeesWinException:
+            print('The ant queen has perished. Please try again.')
+            return False
+
+    def deploy_ant(self, place_name, ant_type_name):
+        """Place an ant if enough food is available.
+
+        This method is called by the current strategy to deploy ants.
+        """
+        constructor = self.ant_types[ant_type_name]
+        if self.food < constructor.food_cost:
+            print('Not enough food remains to place ' + ant_type_name)
+        else:
+            ant = constructor()
+            self.places[place_name].add_insect(ant)
+            self.food -= constructor.food_cost
+            return ant
+
+    def remove_ant(self, place_name):
+        """Remove an Ant from the Colony."""
+        place = self.places[place_name]
+        if place.ant is not None:
+            place.remove_insect(place.ant)
+
+    @property
+    def ants(self):
+        return [p.ant for p in self.places.values() if p.ant is not None]
+
+    @property
+    def bees(self):
+        return [b for p in self.places.values() for b in p.bees]
+
+    @property
+    def insects(self):
+        return self.ants + self.bees
+
+    def __str__(self):
+        status = ' (Food: {0}, Time: {1})'.format(self.food, self.time)
+        return str([str(i) for i in self.ants + self.bees]) + status
