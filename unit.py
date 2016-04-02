@@ -50,8 +50,17 @@ class Undergraduate(Human):
 
 class Squirrel(Unit):
 
-	def attack(self, Human):
-		Human.
+    name = 'muthafuckin Squirrel'
 
+	def attack(self, Human):
+		Human.get_hit(1)
+
+	def move(self, place):
+		self.place.remove_unit(self)
+        place.add_unit(self)
+
+    def action(self, campus):
+        if self.place is not campus.Tree and self.health > 0:
+            self.move(self.place.exit)
 
 
