@@ -1,7 +1,6 @@
 #The Place class includes path and non-path places.#
 
 import random
-import unit.py
 
 class Place(object):
     """A Place holds squirrels/humans and has an exit leading to another Place."""
@@ -45,7 +44,7 @@ class Tree(Place):
         self.ant = None
         self.exit = None
 
-    def strategy(self, campus):
+    def strategy(self, campus): #what is this function doing???#
         exits = [p for p in campus.places.values() if p.entrance is self]
         for squirrel in self.assault_plan.get(campus.time, []):
             squirrel.move_to(random.choice(exits))
@@ -56,15 +55,6 @@ class Base(Place):
     def add_unit(self, unit):
         assert not unit.is_human, 'Cannot add {0} to Base'
         raise SquirrelsWinException()
-
-# Weiwei's edit: added ants_win and bees_win
-def ants_win():
-    """Signal that Ants win."""
-    raise AntsWinException()
-
-def bees_win():
-    """Signal that Bees win."""
-    raise BeesWinException()
 
 class GameOverException(Exception):
     """Base game over Exception."""
@@ -205,5 +195,51 @@ def plaza_layout(queen, register_place, tunnels=1, length=10, moat_frequency=3):
     
 
 =======
+=======
 class AssaultPlan(dict):
+    """Dictionary from times to waves(list of bees)"""
+    def add_wave(self, squirrel_type, bee_health, time, count):
+        """Add a wave at time with count Squirrels that have the specified health."""
+        squirrels = [squirrel_type(squirrel_health) for _ in range(count)]
+        self.setdefault(time, []).extend(squirrels)
+        return self
 
+    @property
+    def all_squirrels(self):
+        """Place all Squirrels in the Tree and return the list of Squirrels."""
+        return [squirrel for wave in self.values() for squirrel in wave]
+
+    def make_test_assault_plan():
+            plan = AssaultPlan()
+            for time in range(3, 16, 2):
+                plan.add_wave(Squirrel, 3, time, 1)
+            return plan
+
+def interactive_strategy(campus):
+    print('campus: ' + str(campus))
+    msg = '<Control>-D (<Control>-Z <Enter> on Windows) completes a turn.\n'
+    interact(msg)
+
+def start_with_strategy(args, strategy):
+    """Reads command-line arguments and starts a game with those options."""
+    import argparse
+    parser = argparse.ArgumentParser(description="Play Students vs Squirrels")
+    parser.add_argument('-d', type=str, metavar='DIFFICULTY',
+                        help='sets difficulty of game (easy/medium/hard/insane)')
+    parser.add_argument('--cost', type=int,
+                        help='number of cost to start with when testing', default=2)
+    args = parser.parse_args()
+
+    assault_plan = make_test_assault_plan()
+    tunnel_length = 10
+    num_tunnels = 1
+    costs = args.cost
+
+    tree = Tree(assault_plan)
+    dimensions = (num_tunnels, tunnel_length)
+    return AntColony(strategy, tree, human_types(), layout, dimensions, cost).simulate()
+
+from utils import *
+@main
+def run(*args):
+    start_with_strategy(args, interactive_strategy)
